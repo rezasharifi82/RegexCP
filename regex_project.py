@@ -3,7 +3,7 @@ from collections import deque
 def get_list(ls):
     return (fuck3(fuck2(fuck(ls))))
 
-
+khkhkhhkk
 def fuck(ls):
     while (ls[0] == ')' and ls[-1] == '('):
         ls = ls[1:-1]
