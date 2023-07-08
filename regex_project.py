@@ -1,4 +1,6 @@
 landa = 'L'
+
+
 class State:
     num = 1
 
@@ -14,20 +16,22 @@ class State:
         return self.name
 
     def __gt__(self, other):
-        return int(self.name[-1])>int(other.name[-1])
+        return int(self.name[-1]) > int(other.name[-1])
+
+
 class Dfa:
 
-    def __init__(self, begin, final_state,terminal):
+    def __init__(self, begin, final_state, terminal):
         self.states = []
         self.transition = []
-        self.terminal=terminal
+        self.terminal = terminal
         self.trap = None
         self.final = None
         self.states.append(begin)
         self.end = final_state
         self.start = begin
 
-    def dont_know_wtf_should_i_name_this_func(self):
+    def nfa_to_dfa(self):
         for j in self.states:
             for i in self.terminal:
                 temp = set()
@@ -50,10 +54,10 @@ class Dfa:
         for i in self.terminal:
             pass
         self.transition.append([trap_state, i, trap_state])
-        ls=[i[:-1] for i in self.transition]
+        ls = [i[:-1] for i in self.transition]
         for j in self.states:
             for i in self.terminal:
-                if [j,i] not in ls :
+                if [j, i] not in ls:
                     self.transition.append([j, i, trap_state])
 
     def set_fin(self):
@@ -67,30 +71,30 @@ class Dfa:
         # Partition the states into two groups: final and non-final states
         non_final_states = [state_set for state_set in self.states if self.end not in state_set]
         final_states = [state_set for state_set in self.states if self.end in state_set]
-        partitions=[non_final_states,final_states]
-        transition_list=[i[:-1] for i in self.transition]
+        partitions = [non_final_states, final_states]
+        transition_list = [i[:-1] for i in self.transition]
         while True:
-            change=False
+            change = False
             for group in partitions:
-                transition_numbers=[]
+                transition_numbers = []
                 for state_set in group:
-                    num=1
+                    num = 1
                     for terminal in self.terminal:
-                        temp_num=0
-                        index=transition_list.index([state_set,terminal])
-                        des=self.transition[index][-1]
+                        temp_num = 0
+                        index = transition_list.index([state_set, terminal])
+                        des = self.transition[index][-1]
                         for i in partitions:
                             if des in i:
-                                temp_num=partitions.index(i)
+                                temp_num = partitions.index(i)
                                 break
-                        num*=10
-                        num+=temp_num
+                        num *= 10
+                        num += temp_num
                     transition_numbers.append(num)
-                if(len(set(transition_numbers))!=1):
-                    change=True
-                    fine_list=[]
-                    fine_list_numbers=[]
-                    for ind,state_set in enumerate(group):
+                if (len(set(transition_numbers)) != 1):
+                    change = True
+                    fine_list = []
+                    fine_list_numbers = []
+                    for ind, state_set in enumerate(group):
                         if transition_numbers[ind] not in fine_list_numbers:
                             fine_list_numbers.append(transition_numbers[ind])
                             fine_list.append([state_set])
@@ -111,37 +115,45 @@ class Dfa:
                     self.transition[[x[-1] for x in self.transition].index(j)][-1] = i[0]
         self.trans_set()
         self.set_fin()
+
     def trans_set(self):
         for item in reversed(self.transition):
-            while self.transition.count(item)>1:
+            while self.transition.count(item) > 1:
                 self.transition.remove(item)
-    def do_transition(self,start:set,trans):
-        return self.transition[[x[:-1]for x in self.transition].index([start,trans])][-1]
-def Compare_dfa(dfa1:Dfa,dfa2:Dfa):
+
+    def do_transition(self, start: set, trans):
+        return self.transition[[x[:-1] for x in self.transition].index([start, trans])][-1]
+
+
+def Compare_dfa(dfa1: Dfa, dfa2: Dfa):
     for i in dfa1.terminal:
         if i not in dfa2.terminal:
             return False
     for i in dfa2.terminal:
         if i not in dfa1.terminal:
             return False
-    match=[]#[dfa1.state,dfa2.state,check?]
-    all_states=[]
-    match.append([dfa1.start,dfa2.start])
+    match = []  # [dfa1.state,dfa2.state,check?]
+    all_states = []
+    match.append([dfa1.start, dfa2.start])
     all_states.append(dfa1.start)
     all_states.append(dfa2.start)
     for i in match:
         if (i[0] in dfa1.final and i[1] not in dfa2.final) or (i[0] not in dfa1.final and i[1] in dfa2.final):
             return False
         for j in dfa1.terminal:
-            if [dfa1.do_transition(i[0],j),dfa2.do_transition(i[1],j)] not in match:
-                if (dfa2.do_transition(i[1],j) in all_states) or (dfa1.do_transition(i[0],j) in all_states):
+            if [dfa1.do_transition(i[0], j), dfa2.do_transition(i[1], j)] not in match:
+                if (dfa2.do_transition(i[1], j) in all_states) or (dfa1.do_transition(i[0], j) in all_states):
                     return False
-                match.append([dfa1.do_transition(i[0],j),dfa2.do_transition(i[1],j)])
-                all_states.append(dfa1.do_transition(i[0],j))
+                match.append([dfa1.do_transition(i[0], j), dfa2.do_transition(i[1], j)])
+                all_states.append(dfa1.do_transition(i[0], j))
                 all_states.append(dfa2.do_transition(i[1], j))
     return True
+
+
 def get_list(ls):
     return fuck3(fuck2(fuck(ls)))
+
+
 def fuck(ls):
     while ls[0] == ')' and ls[-1] == '(':
         ls = ls[1:-1]
@@ -166,6 +178,8 @@ def fuck(ls):
             i += 1
             result.append(fuck(temp))
     return result
+
+
 def fuck2(ls: list):
     for it in range(len(ls)):
         i = ls[it]
@@ -182,6 +196,8 @@ def fuck2(ls: list):
             res += ls[ind + 1:]
         ls = res
     return ls
+
+
 def fuck3(ls: list):
     for it, i in enumerate(ls):
         if type(i) == list:
@@ -193,7 +209,12 @@ def fuck3(ls: list):
         res = [first_state, 'or', second]
         ls = res
     return ls
+
+
 def nfa_generator(ls: list, current: State):
+    print(ls)
+    while(len(ls)==1 and type(ls)==list):
+        ls=ls[0]
     if len(ls) == 3 and ls[1] == 'or':
         current = or_generator(ls, current)
     elif len(ls) == 2 and ls[1] == '*':
@@ -201,8 +222,13 @@ def nfa_generator(ls: list, current: State):
     else:
         current = and_generator(ls, current)
     return current
+
+
 def and_generator(trans: list, currnet: State):
     for i in trans:
+        temp=State()
+        currnet.ls.append((landa,temp))
+        currnet=temp
         if type(i) is list and len(i) > 1:
             currnet = nfa_generator(i, currnet)
         else:
@@ -212,6 +238,8 @@ def and_generator(trans: list, currnet: State):
             currnet.ls.append((i, b))
             currnet = b
     return currnet
+
+
 def or_generator(trans: list, current: State):
     a = State()
     b = State()
@@ -223,30 +251,42 @@ def or_generator(trans: list, current: State):
     c.ls.append((landa, e))
     d.ls.append((landa, e))
     return e
+
+
 def star_generator(trans: list, current: State):
     b = nfa_generator(trans[0], current)
     b.ls.append((landa, current))
     current.ls.append((landa, b))
     return b
+
+
 def print_grammar(current: State):
     visited = set()
     grammar(current, visited)
+
+
 def grammar(current: State, visited):
     visited.add(current)
     for i in current.ls:
         print(current.name, '--', i[0], '->', i[1].name)
         if i[1] not in visited:
             grammar(i[1], visited)
+
+
 def save_states(states: set, first_state: State):
     states.add(first_state)
     for i in first_state.ls:
         if i[1] not in states:
             save_states(states, i[1])
+
+
 def print_set(ls: set):
     for it, i in enumerate(ls):
         print(i.name, end='')
         if it != len(ls) - 1:
             print(',', end='')
+
+
 def complete_set_landatrans(state_list: set):
     for temp in state_list:
         for j in temp.ls:
@@ -254,17 +294,23 @@ def complete_set_landatrans(state_list: set):
                 state_list.add(j[1])
                 return complete_set_landatrans(state_list)
     return state_list
+
+
 def complete_set(temp: State, des_set: set, transition: str):
     temp_set = des_set.copy()
     for i in temp.ls:
         if i[0] == transition and i[1] not in temp_set:
             temp_set.add(i[1])
     return temp_set
+
+
 def fuck_this_shit(began_set, des_set, trans):
     final_set = set()
     for k in began_set:
         final_set = final_set.union(set(complete_set(k, des_set, trans)))
     return final_set
+
+
 def print_dfa(dfa):
     for it, i in enumerate(dfa.states):
         print('state', it, ':', end='')
@@ -279,46 +325,45 @@ def print_dfa(dfa):
     print('\nstart state: 0 ')
     print('finall states:', dfa.final)
     print('trap:', dfa.states.index(dfa.trap))
+
+
 def get_terminal(reg):
     terminals = []
     for i in list(reg):
         if i not in ['+', '*', '(', ')', 'L'] and i not in terminals:
             terminals.append(i)
     return terminals
+
+
 def get_min_dfa():
     print("enter regex:")
     reg = input()
     terminal = get_terminal(reg)
-    # print('terminal:', terminal)
+    print('terminal:', terminal)
     list1 = get_list(list(reg))
-    # print('list: ', list1)
-    # print('\n----------------nfa--------------------')
+    print('list: ', list1)
+    print('\n----------------nfa--------------------')
     first = State()
     first_set = set()
     end = nfa_generator(list1, first)
-    # print_grammar(first)
+    print_grammar(first)
     save_states(first_set, first)
     start = set()
     start.add(first)
     complete_set_landatrans(start)
-    # print('\n----------------dfa--------------------')
+    print('\n----------------dfa--------------------')
     first_dfa = Dfa(start, end, terminal)
-    first_dfa.dont_know_wtf_should_i_name_this_func()
-    # print_dfa(first_dfa)
-    # print('\n----------------min--------------------')
+    first_dfa.nfa_to_dfa()
+    print_dfa(first_dfa)
+    print('\n----------------min--------------------')
     first_dfa.minimize()
-    # print_dfa(first_dfa)
+    print_dfa(first_dfa)
     return first_dfa
 
-
-
-
-
-dfa1=(get_min_dfa())
-print_dfa(dfa1)
-dfa2=(get_min_dfa())
-print_dfa(dfa2)
-print(Compare_dfa(dfa1,dfa2))
+while True:
+    dfa1 = (get_min_dfa())
+    dfa2 = (get_min_dfa())
+    print(Compare_dfa(dfa1, dfa2))
 
 # b*(abb*)*(a+L)
 # (b+ab)*(a+L)
